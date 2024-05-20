@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -6,7 +7,11 @@ namespace baza
 {
     class Program
     {
-        static string connectionString = "";  //Połączenie z bazą danych 
+        static string connectionString = $"server={Properties.Resources.server};" +
+            $"uid={Properties.Resources.uid};" +
+            $"pwd={Properties.Resources.pwd};" +
+            $"database={Properties.Resources.db}";
+        MySqlConnection conn;  //Połączenie z bazą danych 
         static void Main(string[] args)
         {
             while (true)
@@ -62,11 +67,11 @@ namespace baza
         // Funkcja do wyświetlania pracowników
         static void WyswietlPracownikow() 
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
                 connection.Open();
                 string query = "SELECT * FROM workers";
-                SqlCommand command = new SqlCommand(query, connection);
+                MySqlConnection command = new SqlCommand(query, connection);
                 SqlDataReader reader = command.ExecuteReader();
 
                 while (reader.Read())
