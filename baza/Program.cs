@@ -11,7 +11,7 @@ namespace baza
             $"uid={Properties.Resources.uid};" +
             $"pwd={Properties.Resources.pwd};" +
             $"database={Properties.Resources.db}";
-        MySqlConnection conn;  //Połączenie z bazą danych 
+        //MySqlConnection conn;  //Połączenie z bazą danych 
         static void Main(string[] args)
         {
             while (true)
@@ -26,8 +26,8 @@ namespace baza
                 Console.WriteLine("7. Notatki o danym użytkowniku");
                 Console.WriteLine("8. Wyjście");
                 Console.WriteLine("Wybierz opcję:");
-                int option;
-                if (!int.TryParse(Console.ReadLine(), out option))
+               // int option;
+                if (!int.TryParse(Console.ReadLine(), out int option))
                 {
                     Console.WriteLine("Niepoprawna opcja. Spróbuj ponownie.");
                     continue;
@@ -71,8 +71,8 @@ namespace baza
             {
                 connection.Open();
                 string query = "SELECT * FROM workers";
-                MySqlConnection command = new SqlCommand(query, connection);
-                SqlDataReader reader = command.ExecuteReader();
+                MySqlCommand  command = new MySqlCommand(query, connection);
+                MySqlDataReader reader = command.ExecuteReader();
 
                 while (reader.Read())
                 {
@@ -94,12 +94,12 @@ namespace baza
                 Console.WriteLine("Niepoprawne ID. Spróbuj ponownie.");
                 return;
             }
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
                 connection.Open();
                 string query = $"SELECT * FROM workers WHERE id_worker = {idPracownika}";
-                SqlCommand command = new SqlCommand(query, connection);
-                SqlDataReader reader = command.ExecuteReader();
+                MySqlCommand command = new MySqlCommand(query, connection);
+                MySqlDataReader reader = command.ExecuteReader();
 
                 if (reader.Read())
                 {
@@ -107,6 +107,7 @@ namespace baza
                     Console.WriteLine($"{reader["name"]} {reader["surname"]} ({reader["age"]} lat)");
                     Console.WriteLine($"Login: {reader["login"]}");
                     Console.WriteLine($"Zatrudniony: {reader["hire_date"]} na stanowisku {GetRoleName((int)reader["id_role"])}");
+                    Console.WriteLine();
                 }
                 else
                 {
@@ -116,12 +117,12 @@ namespace baza
             }}
       static void WyswietlStanowiskaILiczbePracownikow()
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
                 connection.Open();
                 string query = "SELECT role_name, COUNT(*) AS liczba_pracownikow FROM workers JOIN role ON workers.id_role = role.id_role GROUP BY role_name";
-                SqlCommand command = new SqlCommand(query, connection);
-                SqlDataReader reader = command.ExecuteReader();
+                MySqlCommand command = new MySqlCommand(query, connection);
+                MySqlDataReader reader = command.ExecuteReader();
 
                 while (reader.Read())
                 {
@@ -156,11 +157,11 @@ namespace baza
                 return;
             }
 
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
                 connection.Open();
                 string query = $"INSERT INTO workers (name, surname, login, password, id_role, age) VALUES ('{imie}', '{nazwisko}', '{login}', '{haslo}', {idStanowiska}, {wiek})";
-                SqlCommand command = new SqlCommand(query, connection);
+                MySqlCommand command = new MySqlCommand(query, connection);
                 int rowsAffected = command.ExecuteNonQuery();
                 if (rowsAffected > 0)
                 {
@@ -181,11 +182,11 @@ namespace baza
                 Console.WriteLine("Niepoprawne ID. Operacja anulowana.");
                 return;
             }
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
                 connection.Open();
                 string query = $"DELETE FROM workers WHERE id_worker = {idPracownika}";
-                SqlCommand command = new SqlCommand(query, connection);
+                MySqlCommand command = new MySqlCommand(query, connection);
                 int rowsAffected = command.ExecuteNonQuery();
                 if (rowsAffected > 0)
                 {
@@ -210,11 +211,11 @@ namespace baza
             Console.WriteLine("Podaj nowe hasło:");
             string noweHaslo = Console.ReadLine();
 
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
                 connection.Open();
                 string query = $"UPDATE workers SET password = '{noweHaslo}' WHERE id_worker = {idPracownika}";
-                SqlCommand command = new SqlCommand(query, connection);
+                MySqlCommand command = new MySqlCommand(query, connection);
                 int rowsAffected = command.ExecuteNonQuery();
                 if (rowsAffected > 0)
                 {
@@ -239,11 +240,11 @@ namespace baza
             Console.WriteLine("Podaj treść notatki:");
             string trescNotatki = Console.ReadLine();
 
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
                 connection.Open();
                 string query = $"INSERT INTO note (id_worker, content) VALUES ({idPracownika}, '{trescNotatki}')";
-                SqlCommand command = new SqlCommand(query, connection);
+                MySqlCommand command = new MySqlCommand(query, connection);
                 int rowsAffected = command.ExecuteNonQuery();
                 if (rowsAffected > 0)
                 {
@@ -254,6 +255,7 @@ namespace baza
                     Console.WriteLine("Dodanie notatki nie powiodło się. Spróbuj ponownie.");
                 }
             }
+        }
             static string GetRoleName(int roleId)  //Funkcja do pobierania nazwy stanowiska na podstawie jego ID
             {
                 switch (roleId)
@@ -271,6 +273,6 @@ namespace baza
                 }
             }
         } 
-    }}
+    }
 
 //Środowisko pracy: Visual Studio2022, język: C#, system operacyjny: Windows
